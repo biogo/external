@@ -16,7 +16,7 @@
 package last
 
 import (
-	"code.google.com/p/biogo/external"
+	"code.google.com/p/biogo.external"
 	check "launchpad.net/gocheck"
 	"os/exec"
 	"testing"
