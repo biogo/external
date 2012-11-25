@@ -100,9 +100,6 @@ func Build(cb CommandBuilder, funcs ...template.FuncMap) (args []string, err err
 			for _, f := range funcs {
 				tmpl.Funcs(f)
 			}
-			if err != nil {
-				return args, err
-			}
 			_, err = tmpl.Parse(tag)
 			if err != nil {
 				return args, err
