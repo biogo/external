@@ -76,6 +76,9 @@ type Mafft struct {
 	Amino   bool     `buildarg:"{{if .}}--amino{{end}}"`                   // --amino
 	Seed    []string `buildarg:"{{mprintf \"--seed %q\" . | join \" \"}}"` // --seed <file>...
 
+	// Performance:
+	Threads int `buildarg:"{{with .}}--thread {{.}}{{end}}"` // --thread <n>
+
 	// Files:
 	InFile  string `buildarg:"{{with .}}{{softquote .}}{{end}}"` // <inputfile> - use "-" for stdin.
 	OutFile string `buildarg:"{{with .}} >\"{{.}}\"{{end}}"`     // ><outfile>
