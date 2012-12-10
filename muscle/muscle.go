@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// Package muslce implements interaction with the MUSCLE multiple alignment tool.
+// Package muscle implements interaction with the MUSCLE multiple alignment tool.
 // MUSCLE is available from http://www.drive5.com/muscle/
 package muscle
 
