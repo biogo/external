@@ -54,14 +54,25 @@ func Mprintf(format string, slice interface{}) (f []string, err error) {
 	return
 }
 
-// Quote wraps in quotes each string of a slice.
-func Quote(s []string) (q []string) {
-	q = make([]string, len(s))
-	for i, u := range s {
-		q[i] = fmt.Sprintf("%q", u)
+// Quote wraps in quotes an item or each element of a slice. The returned value is either
+// a string or a slice of strings. Maps are not handled; Quote will panic if given a map to
+// process.
+func Quote(s interface{}) interface{} {
+	rv := reflect.ValueOf(s)
+	switch rv.Kind() {
+	case reflect.Slice:
+		q := make([]string, rv.Len())
+		for i := 0; i < rv.Len(); i++ {
+			q[i] = fmt.Sprintf("%q", rv.Index(i).Interface())
+		}
+		return q
+	case reflect.Map:
+		panic("external: map quoting not handled")
+	default:
+		return fmt.Sprintf("%q", s)
 	}
 
-	return
+	panic("cannot reach")
 }
 
 // Join calls strings.Join with the parameter order reversed to allow use in a template pipeline.
@@ -69,7 +80,9 @@ func Join(sep string, a []string) string { return strings.Join(a, sep) }
 
 // Build builds a set of command line args from cb, which must be a struct. cb's fields
 // are inspected for struct tags "buildarg" key. The value for buildarg tag should be a valid
-// text template.
+// text template. Build applies executes the template using the value of the field or each
+// element of the value of the field if the field is a slice or an array.
+// An argument split tag, "||", is used to denote separation of switches and their parameters.
 // Template functions can be provided via funcs. Three convenience functions are provided:
 //  quote is a template function that wraps elements of a slice of strings in quotes.
 //  mprintf is a template function that applies fmt.Sprintf to each element of a slice.
@@ -80,37 +93,63 @@ func Build(cb CommandBuilder, funcs ...template.FuncMap) (args []string, err err
 		v = v.Elem()
 	}
 	if v.Kind() != reflect.Struct {
-		return nil, errors.New("not a struct")
+		return nil, errors.New("external: not a struct")
 	}
 	n := v.NumField()
 	t := v.Type()
+	b := &bytes.Buffer{}
 	for i := 0; i < n; i++ {
-		f := t.Field(i)
-		if f.PkgPath != "" {
+		tf := t.Field(i)
+		if tf.PkgPath != "" {
 			continue
 		}
-		tag := f.Tag.Get("buildarg")
+		tag := tf.Tag.Get("buildarg")
 		if tag != "" {
-			tmpl := template.New(f.Name)
+			tmpl := template.New(tf.Name)
 			tmpl.Funcs(template.FuncMap{
 				"join":    Join,
 				"quote":   Quote,
 				"mprintf": Mprintf,
 			})
-			for _, f := range funcs {
-				tmpl.Funcs(f)
+			for _, fn := range funcs {
+				tmpl.Funcs(fn)
 			}
+
 			_, err = tmpl.Parse(tag)
 			if err != nil {
 				return args, err
 			}
-			b := &bytes.Buffer{}
-			err = tmpl.Execute(b, v.Field(i).Interface())
-			if err != nil {
-				return args, err
-			}
-			if b.Len() > 0 {
-				args = append(args, string(b.Bytes()))
+			switch f := v.Field(i); f.Kind() {
+			case reflect.Slice, reflect.Array:
+				for j := 0; j < f.Len(); j++ {
+					err = tmpl.Execute(b, f.Index(j).Interface())
+					if err != nil {
+						return args, err
+					}
+					if b.Len() > 0 {
+						if strings.Index(tag, "||") < 0 {
+							args = append(args, b.String())
+						} else {
+							args = append(args, strings.Split(b.String(), "||")...)
+						}
+					}
+					b.Reset()
+				}
+			case reflect.Map:
+				return args, errors.New("external: map fields not handled")
+			default:
+				err = tmpl.Execute(b, f.Interface())
+				if err != nil {
+					return args, err
+				}
+				if b.Len() > 0 {
+					if strings.Index(tag, "||") < 0 {
+						args = append(args, b.String())
+					} else {
+						args = append(args, strings.Split(b.String(), "||")...)
+					}
+				}
+				b.Reset()
 			}
 		}
 	}

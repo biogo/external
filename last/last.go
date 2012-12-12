@@ -51,18 +51,18 @@ type DB struct {
 	Softmask bool `buildarg:"{{if .}}-c{{end}}"` // -c: soft-mask lowercase letters
 
 	// Advanced Options:
-	VolumeSize  int    `buildarg:"{{with .}}-s {{.}}{{end}}"`     // -s: volume size
-	SeedPattern string `buildarg:"{{with .}}-m \"{{.}}\"{{end}}"` // -m: spaced seed pattern
-	HeaderFile  string `buildarg:"{{with .}}-u \"{{.}}\"{{end}}"` // -u: subset seed file
-	IndexStep   int    `buildarg:"{{with .}}-w {{.}}{{end}}"`     // -w: index step
-	Alphabet    string `buildarg:"{{with .}}-a \"{{.}}\"{{end}}"` // -a: user-defined alphabet
-	BucketDepth int    `buildarg:"{{with .}}-b {{.}}{{end}}"`     // -b: bucket depth
-	OnlyCount   bool   `buildarg:"{{if .}}-x{{end}}"`             // -x: just count sequences and letters
-	Verbose     bool   `buildarg:"{{if .}}-v{{end}}"`             // -v: be verbose
+	VolumeSize  int    `buildarg:"{{if .}}-s||{{.}}{{end}}"` // -s: volume size
+	SeedPattern string `buildarg:"{{if .}}-m||{{.}}{{end}}"` // -m: spaced seed pattern
+	HeaderFile  string `buildarg:"{{if .}}-u||{{.}}{{end}}"` // -u: subset seed file
+	IndexStep   int    `buildarg:"{{if .}}-w||{{.}}{{end}}"` // -w: index step
+	Alphabet    string `buildarg:"{{if .}}-a||{{.}}{{end}}"` // -a: user-defined alphabet
+	BucketDepth int    `buildarg:"{{if .}}-b||{{.}}{{end}}"` // -b: bucket depth
+	OnlyCount   bool   `buildarg:"{{if .}}-x{{end}}"`        // -x: just count sequences and letters
+	Verbose     bool   `buildarg:"{{if .}}-v{{end}}"`        // -v: be verbose
 
 	// Files:
-	OutFile string   `buildarg:"\"{{.}}\""`                // "<lastdb>"
-	InFiles []string `buildarg:"{{quote . | join \" \"}}"` // "<in.fa>"...
+	OutFile string   `buildarg:"{{.}}`  // "<lastdb>"
+	InFiles []string `buildarg:"{{.}}"` // "<in.fa>"...
 }
 
 func (db DB) BuildCommand() (*exec.Cmd, error) {
@@ -133,42 +133,42 @@ type Align struct {
 	Cmd string `buildarg:"{{if .}}{{.}}{{else}}lastal{{end}}"` // lastal
 
 	// Score options:
-	MatchScore     int    `buildarg:"{{with .}}-r {{.}}{{end}}"`     // -r: match score
-	MismatchCost   int    `buildarg:"{{with .}}-q {{.}}{{end}}"`     // -q: mismatch cost
-	ScoreFile      string `buildarg:"{{with .}}-p \"{{.}}\"{{end}}"` // -p: file for residue pair scores
-	GapCost        int    `buildarg:"{{with .}}-a {{.}}{{end}}"`     // -a: gap existence cost
-	ExtendCost     int    `buildarg:"{{with .}}-b {{.}}{{end}}"`     // -b: gap extension cost
-	UnalignedCost  int    `buildarg:"{{with .}}-c {{.}}{{end}}"`     // -c: unaligned residue pair cost
-	FrameShiftCost int    `buildarg:"{{with .}}-F {{.}}{{end}}"`     // -F: frameshift cost (off)
-	MaxGapDrop     int    `buildarg:"{{with .}}-x {{.}}{{end}}"`     // -x: max score drop for gapped
-	MaxGaplessDrop int    `buildarg:"{{with .}}-y {{.}}{{end}}"`     // -y: max score drop for gapless
-	MaxFinalDrop   int    `buildarg:"{{with .}}-z {{.}}{{end}}"`     // -z: max score drop for final gapped
-	MinGapless     int    `buildarg:"{{with .}}-d {{.}}{{end}}"`     // -d: min score for gapless
-	MinGapped      int    `buildarg:"{{with .}}-e {{.}}{{end}}"`     // -e: min score for gapped
+	MatchScore     int    `buildarg:"{{if .}}-r||{{.}}{{end}}"` // -r: match score
+	MismatchCost   int    `buildarg:"{{if .}}-q||{{.}}{{end}}"` // -q: mismatch cost
+	ScoreFile      string `buildarg:"{{if .}}-p||{{.}}{{end}}"` // -p: file for residue pair scores
+	GapCost        int    `buildarg:"{{if .}}-a||{{.}}{{end}}"` // -a: gap existence cost
+	ExtendCost     int    `buildarg:"{{if .}}-b||{{.}}{{end}}"` // -b: gap extension cost
+	UnalignedCost  int    `buildarg:"{{if .}}-c||{{.}}{{end}}"` // -c: unaligned residue pair cost
+	FrameShiftCost int    `buildarg:"{{if .}}-F||{{.}}{{end}}"` // -F: frameshift cost (off)
+	MaxGapDrop     int    `buildarg:"{{if .}}-x||{{.}}{{end}}"` // -x: max score drop for gapped
+	MaxGaplessDrop int    `buildarg:"{{if .}}-y||{{.}}{{end}}"` // -y: max score drop for gapless
+	MaxFinalDrop   int    `buildarg:"{{if .}}-z||{{.}}{{end}}"` // -z: max score drop for final gapped
+	MinGapless     int    `buildarg:"{{if .}}-d||{{.}}{{end}}"` // -d: min score for gapless
+	MinGapped      int    `buildarg:"{{if .}}-e||{{.}}{{end}}"` // -e: min score for gapped
 
 	// Cosmetic options:
-	Verbose bool   `buildarg:"{{if .}}-v{{end}}"`             // -v: be verbose
-	OutFile string `buildarg:"{{with .}}-o \"{{.}}\"{{end}}"` // -o: output file
-	Tabular bool   `buildarg:"{{if .}}-f 0{{end}}"`           // -f: output format
+	Verbose bool   `buildarg:"{{if .}}-v{{end}}"`        // -v: be verbose
+	OutFile string `buildarg:"{{if .}}-o||{{.}}{{end}}"` // -o: output file
+	Tabular bool   `buildarg:"{{if .}}-f||0{{end}}"`     // -f: output format
 
 	// Miscellaneous options:
-	Strand      int     `buildarg:"{{with .}}-s {{.}}{{end}}"`     // -s: strand
-	MaxMultiple int     `buildarg:"{{with .}}-m {{.}}{{end}}"`     // -m: max multiplicity for init matches
-	MinSeed     int     `buildarg:"{{with .}}-l {{.}}{{end}}"`     // -l: min length for init matches
-	MaxGapless  int     `buildarg:"{{with .}}-n {{.}}{{end}}"`     // -n: max number of gapless per query pos
-	StepSize    int     `buildarg:"{{with .}}-k {{.}}{{end}}"`     // -k: step-size along the query seq
-	BatchSize   int     `buildarg:"{{with .}}-i {{.}}{{end}}"`     // -i: query batch size
-	MaskLower   int     `buildarg:"{{with .}}-u {{.}}{{end}}"`     // -u: mask lowercase during extensions
-	SupressRep  int     `buildarg:"{{with .}}-w {{.}}{{end}}"`     // -w: supress repeats inside exact matches
-	GenCodeFile string  `buildarg:"{{with .}}-G \"{{.}}\"{{end}}"` // -G: genetic code file
-	Temperature float64 `buildarg:"{{with .}}-t {{.}}{{end}}"`     // -t: 'temperature' for calculating probabilities
-	Gamma       float64 `buildarg:"{{with .}}-g {{.}}{{end}}"`     // -g: 'gamma' parameter for gamma-centroid and LAMA
-	OutputType  int     `buildarg:"{{with .}}-j {{.}}{{end}}"`     // -j: output type
-	InFormat    int     `buildarg:"{{with .}}-Q {{.}}{{end}}"`     // -Q: input format
+	Strand      int     `buildarg:"{{if .}}-s||{{.}}{{end}}"` // -s: strand
+	MaxMultiple int     `buildarg:"{{if .}}-m||{{.}}{{end}}"` // -m: max multiplicity for init matches
+	MinSeed     int     `buildarg:"{{if .}}-l||{{.}}{{end}}"` // -l: min length for init matches
+	MaxGapless  int     `buildarg:"{{if .}}-n||{{.}}{{end}}"` // -n: max number of gapless per query pos
+	StepSize    int     `buildarg:"{{if .}}-k||{{.}}{{end}}"` // -k: step-size along the query seq
+	BatchSize   int     `buildarg:"{{if .}}-i||{{.}}{{end}}"` // -i: query batch size
+	MaskLower   int     `buildarg:"{{if .}}-u||{{.}}{{end}}"` // -u: mask lowercase during extensions
+	SupressRep  int     `buildarg:"{{if .}}-w||{{.}}{{end}}"` // -w: supress repeats inside exact matches
+	GenCodeFile string  `buildarg:"{{if .}}-G||{{.}}{{end}}"` // -G: genetic code file
+	Temperature float64 `buildarg:"{{if .}}-t||{{.}}{{end}}"` // -t: 'temperature' for calculating probabilities
+	Gamma       float64 `buildarg:"{{if .}}-g||{{.}}{{end}}"` // -g: 'gamma' parameter for gamma-centroid and LAMA
+	OutputType  int     `buildarg:"{{if .}}-j||{{.}}{{end}}"` // -j: output type
+	InFormat    int     `buildarg:"{{if .}}-Q||{{.}}{{end}}"` // -Q: input format
 
 	// Files:
-	DB      string   `buildarg:"\"{{.}}\""`                // "<lastdb>"
-	InFiles []string `buildarg:"{{quote . | join \" \"}}"` // "<in.fa>"...
+	DB      string   `buildarg:"{{.}}"` // "<lastdb>"
+	InFiles []string `buildarg:"{{.}}"` // "<in.fa>"...
 }
 
 func (a Align) BuildCommand() (*exec.Cmd, error) {
@@ -205,21 +205,21 @@ type Expect struct {
 	Cmd string `buildarg:"{{if .}}{{.}}{{else}}lastex{{end}}"` // lastex
 
 	// Options:
-	Strand       int    `buildarg:"{{with .}}-s {{.}}{{end}}"`     // -s: strands
-	MatchScore   int    `buildarg:"{{with .}}-r {{.}}{{end}}"`     // -r: match score
-	MismatchCost int    `buildarg:"{{with .}}-q {{.}}{{end}}"`     // -q: mismatch cost
-	ScoreFile    string `buildarg:"{{with .}}-p \"{{.}}\"{{end}}"` // -p: file for residue pair scores
-	GapCost      int    `buildarg:"{{with .}}-a {{.}}{{end}}"`     // -a: gap existence cost
-	ExtendCost   int    `buildarg:"{{with .}}-b {{.}}{{end}}"`     // -b: gap extension cost
-	DoGapless    bool   `buildarg:"{{if .}}-g{{end}}"`             // -g: do calculations for gapless
-	FindThresh   int    `buildarg:"{{with .}}-y {{.}}{{end}}"`     // -y: find alignments with score >= this
-	MaxExpected  int    `buildarg:"{{with .}}-E {{.}}{{end}}"`     // -E: maximum expected number
-	Calculate    int    `buildarg:"{{with .}}-z {{.}}{{end}}"`     // -z: calculate expected alignments
+	Strand       int    `buildarg:"{{if .}}-s||{{.}}{{end}}"` // -s: strands
+	MatchScore   int    `buildarg:"{{if .}}-r||{{.}}{{end}}"` // -r: match score
+	MismatchCost int    `buildarg:"{{if .}}-q||{{.}}{{end}}"` // -q: mismatch cost
+	ScoreFile    string `buildarg:"{{if .}}-p||{{.}}{{end}}"` // -p: file for residue pair scores
+	GapCost      int    `buildarg:"{{if .}}-a||{{.}}{{end}}"` // -a: gap existence cost
+	ExtendCost   int    `buildarg:"{{if .}}-b||{{.}}{{end}}"` // -b: gap extension cost
+	DoGapless    bool   `buildarg:"{{if .}}-g{{end}}"`        // -g: do calculations for gapless
+	FindThresh   int    `buildarg:"{{if .}}-y||{{.}}{{end}}"` // -y: find alignments with score >= this
+	MaxExpected  int    `buildarg:"{{if .}}-E||{{.}}{{end}}"` // -E: maximum expected number
+	Calculate    int    `buildarg:"{{if .}}-z||{{.}}{{end}}"` // -z: calculate expected alignments
 
 	// Files:
-	Ref        string   `buildarg:"\"{{.}}\""`                // "<lastdb>"
-	Query      string   `buildarg:"\"{{.}}\""`                // "<lastdb>"
-	AlignFiles []string `buildarg:"{{quote . | join \" \"}}"` // "<in.maf>"...
+	Ref        string   `buildarg:"{{.}}"` // "<lastdb>"
+	Query      string   `buildarg:"{{.}}"` // "<lastdb>"
+	AlignFiles []string `buildarg:"{{.}}"` // "<in.maf>"...
 }
 
 func (e Expect) BuildCommand() (*exec.Cmd, error) {

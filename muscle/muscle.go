@@ -52,10 +52,10 @@ type Muscle struct {
 	Cmd string `buildarg:"{{if .}}{{.}}{{else}}muscle{{end}}"` // muscle
 
 	// Files:
-	InFile  string `buildarg:"{{with .}}-in \"{{.}}\"{{end}}"`                              // -in <inputfile>
-	OutFile string `buildarg:"{{with .}}-out \"{{.}}\"{{end}}"`                             // -out <outputfile>
-	Log     Log    `buildarg:"{{if .File}}-log{{if .Append}}a{{end}} \"{{.File}}\"{{end}}"` // -log[a] <logfile>
-	Quiet   bool   `buildarg:"{{if .}}-quiet{{end}}"`                                       // -quiet
+	InFile  string `buildarg:"{{if .}}-in||{{.}}{{end}}"`                                // -in <inputfile>
+	OutFile string `buildarg:"{{if .}}-out||{{.}}{{end}}"`                               // -out <outputfile>
+	Log     Log    `buildarg:"{{if .File}}-log{{if .Append}}a{{end}}||{{.File}}{{end}}"` // -log[a] <logfile>
+	Quiet   bool   `buildarg:"{{if .}}-quiet{{end}}"`                                    // -quiet
 
 	// Formatting:
 	Html          bool `buildarg:"{{if .}}-html{{end}}"`      // -html
@@ -64,50 +64,50 @@ type Muscle struct {
 	ClustalStrict bool `buildarg:"{{if .}}-clwstrict{{end}}"` // -clwstrict
 
 	// Common options:
-	FindDiagonals bool          `buildarg:"{{if .}}-diags{{end}}"`                  // -diags
-	MaxIterations int           `buildarg:"{{with .}}-maxiters {{.}}{{end}}"`       // -maxiters <n>
-	MaxDuration   time.Duration `buildarg:"{{with .}}-maxhours {{hours .}}{{end}}"` // -maxhours <h>
+	FindDiagonals bool          `buildarg:"{{if .}}-diags{{end}}"`                 // -diags
+	MaxIterations int           `buildarg:"{{if .}}-maxiters||{{.}}{{end}}"`       // -maxiters <n>
+	MaxDuration   time.Duration `buildarg:"{{if .}}-maxhours||{{hours .}}{{end}}"` // -maxhours <h>
 
 	// Other value options (see MUSCLE user guide):
 	// Gleaned from user guide - may not reflect reality.
-	AnchorSpacing   int     `buildarg:"{{with .}}-anchorspacing {{.}}{{end}}"`   // -anchorspacing <n>
-	Center          float64 `buildarg:"{{with .}}-center {{.}}{{end}}"`          // -center <f.>
-	Cluster1        string  `buildarg:"{{with .}}-cluster1 \"{{.}}\"{{end}}"`    // -cluster1 "upgma|upgma|neighborjoining"
-	Cluster2        string  `buildarg:"{{with .}}-cluster2 \"{{.}}\"{{end}}"`    // -cluster2 "upgma|upgma|neighborjoining"
-	ClustalOut      string  `buildarg:"{{with .}}-clwout \"{{.}}\"{{end}}"`      // -clwout <file>
-	DiagonalBreak   int     `buildarg:"{{with .}}-diagbreak {{.}}{{end}}"`       // -diagbreak <n>
-	DiagonalLength  int     `buildarg:"{{with .}}-diaglength {{.}}{{end}}"`      // -diaglength <n>
-	DiagonalMargin  int     `buildarg:"{{with .}}-diagmargin {{.}}{{end}}"`      // -diagmargin <n>
-	Distance1       string  `buildarg:"{{with .}}-distance1 \"{{.}}\"{{end}}"`   // -distance1 "kmer6_6|kmer20_3|kmer20_4|kbit20_3|kmer4_6"
-	Distance2       string  `buildarg:"{{with .}}-distance2 \"{{.}}\"{{end}}"`   // -distance2 "pctid_kimura|pctid_log"
-	FastaOut        string  `buildarg:"{{with .}}-fastaout \"{{.}}\"{{end}}"`    // -fastaout <file>
-	GapOpen         float64 `buildarg:"{{with .}}-gapopen {{.}}{{end}}"`         // -gapopen <f.>
-	GapExtend       float64 `buildarg:"{{with .}}-gapextend {{.}}{{end}}"`       // -gapextend <f.>
-	HydroWindow     int     `buildarg:"{{with .}}-hydro {{.}}{{end}}"`           // -hydro <n>
-	HydroFactor     float64 `buildarg:"{{with .}}-hydrofactor {{.}}{{end}}"`     // -hydrofactor <f.>
-	In1             string  `buildarg:"{{with .}}-in1 \"{{.}}\"{{end}}"`         // -in1 <file>
-	In2             string  `buildarg:"{{with .}}-in2 \"{{.}}\"{{end}}"`         // -in2 <file>
-	Matrix          string  `buildarg:"{{with .}}-matrix \"{{.}}\"{{end}}"`      // -matrix <file>
-	MaxTrees        int     `buildarg:"{{with .}}-maxtrees {{.}}{{end}}"`        // -maxtrees <n>
-	MinBestColScore float64 `buildarg:"{{with .}}-minbestcolscore {{.}}{{end}}"` // -minbestcolscore <f.>
-	MinSmoothScore  float64 `buildarg:"{{with .}}-minsmoothscore {{.}}{{end}}"`  // -minsmoothscore <f.>
-	MsaOut          string  `buildarg:"{{with .}}-msaout \"{{.}}\"{{end}}"`      // -msaout <file>
-	ObjectiveScore  string  `buildarg:"{{with .}}-objscore \"{{.}}\"{{end}}"`    // -objscore "sp|ps|dp|xp|spf|spm"
-	PhyInterOut     string  `buildarg:"{{with .}}-phyiout \"{{.}}\"{{end}}"`     // -phyiout <file>
-	PhySequenOut    string  `buildarg:"{{with .}}-physout \"{{.}}\"{{end}}"`     // -physout <file>
-	RefineWindow    int     `buildarg:"{{with .}}-refinewindow {{.}}{{end}}"`    // -refinewindow <n>
-	Root1           string  `buildarg:"{{with .}}-root1 \"{{.}}\"{{end}}"`       // -root1 "pseudo|midlongestspan|minavgleafdist"
-	Root2           string  `buildarg:"{{with .}}-root2 \"{{.}}\"{{end}}"`       // -root2 "pseudo|midlongestspan|minavgleafdist"
-	ScoreFile       string  `buildarg:"{{with .}}-scorefile \"{{.}}\"{{end}}"`   // -scorefile <file>
-	SeqType         string  `buildarg:"{{with .}}-seqtype \"{{.}}\"{{end}}"`     // -seqtype "protein|nucleo|auto"
-	SmoothScoreCeil float64 `buildarg:"{{with .}}-smoothscoreceil {{.}}{{end}}"` // -smoothscoreceil <f.>
-	SmoothWindow    int     `buildarg:"{{with .}}-smoothwindow {{.}}{{end}}"`    // -smoothwindow <n>
-	SpScore         string  `buildarg:"{{with .}}-spscore \"{{.}}\"{{end}}"`     // -spscore <file>
-	Tree1           string  `buildarg:"{{with .}}-tree1 \"{{.}}\"{{end}}"`       // -tree1 <file>
-	Tree2           string  `buildarg:"{{with .}}-tree2 \"{{.}}\"{{end}}"`       // -tree2 <file>
-	UseTree         string  `buildarg:"{{with .}}-usetree \"{{.}}\"{{end}}"`     // -usetree <file>
-	Weight1         string  `buildarg:"{{with .}}-weight1 \"{{.}}\"{{end}}"`     // -weight1 "none|henikoff|henikoffpb|gsc|clustalw|threeway"
-	Weight2         string  `buildarg:"{{with .}}-weight2 \"{{.}}\"{{end}}"`     // -weight2 "none|henikoff|henikoffpb|gsc|clustalw|threeway"
+	AnchorSpacing   int     `buildarg:"{{if .}}-anchorspacing||{{.}}{{end}}"`   // -anchorspacing <n>
+	Center          float64 `buildarg:"{{if .}}-center||{{.}}{{end}}"`          // -center <f.>
+	Cluster1        string  `buildarg:"{{if .}}-cluster1||{{.}}{{end}}"`        // -cluster1 "upgma|upgma|neighborjoining"
+	Cluster2        string  `buildarg:"{{if .}}-cluster2||{{.}}{{end}}"`        // -cluster2 "upgma|upgma|neighborjoining"
+	ClustalOut      string  `buildarg:"{{if .}}-clwout||{{.}}{{end}}"`          // -clwout <file>
+	DiagonalBreak   int     `buildarg:"{{if .}}-diagbreak||{{.}}{{end}}"`       // -diagbreak <n>
+	DiagonalLength  int     `buildarg:"{{if .}}-diaglength||{{.}}{{end}}"`      // -diaglength <n>
+	DiagonalMargin  int     `buildarg:"{{if .}}-diagmargin||{{.}}{{end}}"`      // -diagmargin <n>
+	Distance1       string  `buildarg:"{{if .}}-distance1||{{.}}{{end}}"`       // -distance1 "kmer6_6|kmer20_3|kmer20_4|kbit20_3|kmer4_6"
+	Distance2       string  `buildarg:"{{if .}}-distance2||{{.}}{{end}}"`       // -distance2 "pctid_kimura|pctid_log"
+	FastaOut        string  `buildarg:"{{if .}}-fastaout||{{.}}{{end}}"`        // -fastaout <file>
+	GapOpen         float64 `buildarg:"{{if .}}-gapopen||{{.}}{{end}}"`         // -gapopen <f.>
+	GapExtend       float64 `buildarg:"{{if .}}-gapextend||{{.}}{{end}}"`       // -gapextend <f.>
+	HydroWindow     int     `buildarg:"{{if .}}-hydro||{{.}}{{end}}"`           // -hydro <n>
+	HydroFactor     float64 `buildarg:"{{if .}}-hydrofactor|{{.}}{{end}}"`      // -hydrofactor <f.>
+	In1             string  `buildarg:"{{if .}}-in1||{{.}}{{end}}"`             // -in1 <file>
+	In2             string  `buildarg:"{{if .}}-in2||{{.}}{{end}}"`             // -in2 <file>
+	Matrix          string  `buildarg:"{{if .}}-matrix||{{.}}{{end}}"`          // -matrix <file>
+	MaxTrees        int     `buildarg:"{{if .}}-maxtrees||{{.}}{{end}}"`        // -maxtrees <n>
+	MinBestColScore float64 `buildarg:"{{if .}}-minbestcolscore||{{.}}{{end}}"` // -minbestcolscore <f.>
+	MinSmoothScore  float64 `buildarg:"{{if .}}-minsmoothscore||{{.}}{{end}}"`  // -minsmoothscore <f.>
+	MsaOut          string  `buildarg:"{{if .}}-msaout||{{.}}{{end}}"`          // -msaout <file>
+	ObjectiveScore  string  `buildarg:"{{if .}}-objscore||{{.}}{{end}}"`        // -objscore "sp|ps|dp|xp|spf|spm"
+	PhyInterOut     string  `buildarg:"{{if .}}-phyiout||{{.}}{{end}}"`         // -phyiout <file>
+	PhySequenOut    string  `buildarg:"{{if .}}-physout||{{.}}{{end}}"`         // -physout <file>
+	RefineWindow    int     `buildarg:"{{if .}}-refinewindow|{{.}}{{end}}"`     // -refinewindow <n>
+	Root1           string  `buildarg:"{{if .}}-root1||{{.}}{{end}}"`           // -root1 "pseudo|midlongestspan|minavgleafdist"
+	Root2           string  `buildarg:"{{if .}}-root2||{{.}}{{end}}"`           // -root2 "pseudo|midlongestspan|minavgleafdist"
+	ScoreFile       string  `buildarg:"{{if .}}-scorefile||{{.}}{{end}}"`       // -scorefile <file>
+	SeqType         string  `buildarg:"{{if .}}-seqtype||{{.}}{{end}}"`         // -seqtype "protein|nucleo|auto"
+	SmoothScoreCeil float64 `buildarg:"{{if .}}-smoothscoreceil||{{.}}{{end}}"` // -smoothscoreceil <f.>
+	SmoothWindow    int     `buildarg:"{{if .}}-smoothwindow||{{.}}{{end}}"`    // -smoothwindow <n>
+	SpScore         string  `buildarg:"{{if .}}-spscore||{{.}}{{end}}"`         // -spscore <file>
+	Tree1           string  `buildarg:"{{if .}}-tree1||{{.}}{{end}}"`           // -tree1 <file>
+	Tree2           string  `buildarg:"{{if .}}-tree2||{{.}}{{end}}"`           // -tree2 <file>
+	UseTree         string  `buildarg:"{{if .}}-usetree||{{.}}{{end}}"`         // -usetree <file>
+	Weight1         string  `buildarg:"{{if .}}-weight1||{{.}}{{end}}"`         // -weight1 "none|henikoff|henikoffpb|gsc|clustalw|threeway"
+	Weight2         string  `buildarg:"{{if .}}-weight2||{{.}}{{end}}"`         // -weight2 "none|henikoff|henikoffpb|gsc|clustalw|threeway"
 
 	// Other flag options (see MUSCLE user guide):
 	// Gleaned from user guide - may not reflect reality.
