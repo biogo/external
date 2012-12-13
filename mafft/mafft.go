@@ -30,38 +30,38 @@ type Mafft struct {
 	Cmd string `buildarg:"{{if .}}{{.}}{{else}}mafft{{end}}"` // mafft
 
 	// Algorithm:
-	Auto          bool    `buildarg:"{{if .}}--auto{{end}}"`              // --auto
-	HexamerPair   bool    `buildarg:"{{if .}}--6merpair{{end}}"`          // --6merpair
-	GlobalPair    bool    `buildarg:"{{if .}}--globalpair{{end}}"`        // --globalpair
-	LocalPair     bool    `buildarg:"{{if .}}--localpair{{end}}"`         // --localpair
-	GenafPair     bool    `buildarg:"{{if .}}--genafpair{{end}}"`         // --genafpair
-	FastaPair     bool    `buildarg:"{{if .}}--fastapair{{end}}"`         // --fastapair
-	Weighting     float64 `buildarg:"{{if .}}--weighti||{{.}}{{end}}"`    // --weighti <f.>
-	ReTree        int     `buildarg:"{{if .}}--retree||{{.}}{{end}}"`     // --retree <n>
-	MaxIterate    int     `buildarg:"{{if .}}--maxiterate||{{.}}{{end}}"` // --maxiterate <n>
-	Fft           bool    `buildarg:"{{if .}}--fft{{end}}"`               // --fft
-	NoFft         bool    `buildarg:"{{if .}}--nofft{{end}}"`             // --nofft
-	NoScore       bool    `buildarg:"{{if .}}--noscore{{end}}"`           // --noscore
-	MemSave       bool    `buildarg:"{{if .}}--memsave{{end}}"`           // --memsave
-	Partree       bool    `buildarg:"{{if .}}--parttree{{end}}"`          // --parttree
-	DPPartTree    bool    `buildarg:"{{if .}}--dpparttree{{end}}"`        // --dpparttree
-	FastaPartTree bool    `buildarg:"{{if .}}--fastaparttree{{end}}"`     // --fastaparttree
-	PartSize      int     `buildarg:"{{if .}}--partsize||{{.}}{{end}}"`   // --partsize <n>
-	GroupSize     int     `buildarg:"{{if .}}--groupsize||{{.}}{{end}}"`  // --groupsize <n>
+	Auto          bool    `buildarg:"{{if .}}--auto{{end}}"`                     // --auto
+	HexamerPair   bool    `buildarg:"{{if .}}--6merpair{{end}}"`                 // --6merpair
+	GlobalPair    bool    `buildarg:"{{if .}}--globalpair{{end}}"`               // --globalpair
+	LocalPair     bool    `buildarg:"{{if .}}--localpair{{end}}"`                // --localpair
+	GenafPair     bool    `buildarg:"{{if .}}--genafpair{{end}}"`                // --genafpair
+	FastaPair     bool    `buildarg:"{{if .}}--fastapair{{end}}"`                // --fastapair
+	Weighting     float64 `buildarg:"{{if .}}--weighti{{split}}{{.}}{{end}}"`    // --weighti <f.>
+	ReTree        int     `buildarg:"{{if .}}--retree{{split}}{{.}}{{end}}"`     // --retree <n>
+	MaxIterate    int     `buildarg:"{{if .}}--maxiterate{{split}}{{.}}{{end}}"` // --maxiterate <n>
+	Fft           bool    `buildarg:"{{if .}}--fft{{end}}"`                      // --fft
+	NoFft         bool    `buildarg:"{{if .}}--nofft{{end}}"`                    // --nofft
+	NoScore       bool    `buildarg:"{{if .}}--noscore{{end}}"`                  // --noscore
+	MemSave       bool    `buildarg:"{{if .}}--memsave{{end}}"`                  // --memsave
+	Partree       bool    `buildarg:"{{if .}}--parttree{{end}}"`                 // --parttree
+	DPPartTree    bool    `buildarg:"{{if .}}--dpparttree{{end}}"`               // --dpparttree
+	FastaPartTree bool    `buildarg:"{{if .}}--fastaparttree{{end}}"`            // --fastaparttree
+	PartSize      int     `buildarg:"{{if .}}--partsize{{split}}{{.}}{{end}}"`   // --partsize <n>
+	GroupSize     int     `buildarg:"{{if .}}--groupsize{{split}}{{.}}{{end}}"`  // --groupsize <n>
 
 	// Parameter:
-	GapOpenCost          float64 `buildarg:"{{if .}}--op||{{.}}{{end}}"`       // --op <f.>
-	ExtensionCost        float64 `buildarg:"{{if .}}--ep||{{.}}{{end}}"`       // --ep <f.>
-	LocalOpenCost        float64 `buildarg:"{{if .}}--lop||{{.}}{{end}}"`      // --lop <f.>
-	LocalPairOffset      float64 `buildarg:"{{if .}}--lep||{{.}}{{end}}"`      // --lep <f.>
-	LocalExtensionCost   float64 `buildarg:"{{if .}}--lexp||{{.}}{{end}}"`     // --lexp <f.>
-	GapOpenSkipCost      float64 `buildarg:"{{if .}}--LOP||{{.}}{{end}}"`      // --LOP <f.>
-	GapExtensionSkipCost float64 `buildarg:"{{if .}}--LEXP||{{.}}{{end}}"`     // --LEXP <f.>
-	Blosum               byte    `buildarg:"{{if .}}--bl||{{.}}{{end}}"`       // --bl <n>
-	JttPAM               uint    `buildarg:"{{if .}}--jtt||{{.}}{{end}}"`      // --jtt <n>
-	TransMembranePAM     uint    `buildarg:"{{if .}}--tm||{{.}}{{end}}"`       // --tm <n>
-	AminoMatrix          string  `buildarg:"{{if .}}--aamatrix||{{.}}{{end}}"` // --aamatrix <file>
-	FModel               bool    `buildarg:"{{if .}}--fmodel{{end}}"`          // --fmodel
+	GapOpenCost          float64 `buildarg:"{{if .}}--op{{split}}{{.}}{{end}}"`       // --op <f.>
+	ExtensionCost        float64 `buildarg:"{{if .}}--ep{{split}}{{.}}{{end}}"`       // --ep <f.>
+	LocalOpenCost        float64 `buildarg:"{{if .}}--lop{{split}}{{.}}{{end}}"`      // --lop <f.>
+	LocalPairOffset      float64 `buildarg:"{{if .}}--lep{{split}}{{.}}{{end}}"`      // --lep <f.>
+	LocalExtensionCost   float64 `buildarg:"{{if .}}--lexp{{split}}{{.}}{{end}}"`     // --lexp <f.>
+	GapOpenSkipCost      float64 `buildarg:"{{if .}}--LOP{{split}}{{.}}{{end}}"`      // --LOP <f.>
+	GapExtensionSkipCost float64 `buildarg:"{{if .}}--LEXP{{split}}{{.}}{{end}}"`     // --LEXP <f.>
+	Blosum               byte    `buildarg:"{{if .}}--bl{{split}}{{.}}{{end}}"`       // --bl <n>
+	JttPAM               uint    `buildarg:"{{if .}}--jtt{{split}}{{.}}{{end}}"`      // --jtt <n>
+	TransMembranePAM     uint    `buildarg:"{{if .}}--tm{{split}}{{.}}{{end}}"`       // --tm <n>
+	AminoMatrix          string  `buildarg:"{{if .}}--aamatrix{{split}}{{.}}{{end}}"` // --aamatrix <file>
+	FModel               bool    `buildarg:"{{if .}}--fmodel{{end}}"`                 // --fmodel
 
 	// Output:
 	ClustalOut bool `buildarg:"{{if .}}--clustalout{{end}}"` // --clustalout
@@ -71,12 +71,12 @@ type Mafft struct {
 	Quiet      bool `buildarg:"{{if .}}--quiet{{end}}"`      // --quiet
 
 	// Input:
-	Nucleic bool     `buildarg:"{{if .}}--nuc{{end}}"`                               // --nuc
-	Amino   bool     `buildarg:"{{if .}}--amino{{end}}"`                             // --amino
-	Seed    []string `buildarg:"{{if .}}{{mprintf \"--seed||%s\" . | args}}{{end}}"` // --seed <file>...
+	Nucleic bool     `buildarg:"{{if .}}--nuc{{end}}"`                                 // --nuc
+	Amino   bool     `buildarg:"{{if .}}--amino{{end}}"`                               // --amino
+	Seed    []string `buildarg:"{{if .}}{{mprintf \"--seed\x00%s\" . | args}}{{end}}"` // --seed <file>...
 
 	// Performance:
-	Threads int `buildarg:"{{if .}}--thread||{{.}}{{end}}"` // --thread <n>
+	Threads int `buildarg:"{{if .}}--thread{{split}}{{.}}{{end}}"` // --thread <n>
 
 	// Files:
 	InFile string `buildarg:"{{if .}}{{.}}{{else}}-{{end}}"` // <inputfile> - default to Stdin.

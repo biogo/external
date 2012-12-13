@@ -24,7 +24,6 @@ import (
 	"reflect"
 	"strings"
 	"text/template"
-	"text/template/parse"
 )
 
 // CommandBuilder is an interface that assembles a set of command line arguments, and creates
@@ -79,19 +78,23 @@ func Quote(s interface{}) interface{} {
 // Join calls strings.Join with the parameter order reversed to allow use in a template pipeline.
 func Join(sep string, a []string) string { return strings.Join(a, sep) }
 
-// Args is an alias to Join with sep equal to the split tag, "||".
-func Args(a []string) string { return strings.Join(a, "||") }
+// Args is an alias to Join with sep equal to the split tag.
+func Args(a []string) string { return strings.Join(a, Split()) }
+
+// Split includes the split tag, "\x00".
+func Split() string { return string(0) }
 
 // Build builds a set of command line args from cb, which must be a struct. cb's fields
 // are inspected for struct tags "buildarg" key. The value for buildarg tag should be a valid
 // text template. Build applies executes the template using the value of the field or each
 // element of the value of the field if the field is a slice or an array.
-// An argument split tag, "||", is used to denote separation of switches and their parameters.
+// An argument split tag, "\x00", is used to denote separation of switches and their parameters.
 // Template functions can be provided via funcs. Four convenience functions are provided:
 //  quote is a template function that wraps elements of a slice of strings in quotes.
 //  mprintf is a template function that applies fmt.Sprintf to each element of a slice.
 //  join is a template function that calls strings.Join with parameter order reversed.
 //  args is a template function that joins a slice of strings with the split tag.
+//  split is a template function that indicates a argument split.
 func Build(cb CommandBuilder, funcs ...template.FuncMap) (args []string, err error) {
 	v := reflect.ValueOf(cb)
 	if kind := v.Kind(); kind == reflect.Interface || kind == reflect.Ptr {
@@ -114,6 +117,7 @@ func Build(cb CommandBuilder, funcs ...template.FuncMap) (args []string, err err
 			tmpl.Funcs(template.FuncMap{
 				"join":    Join,
 				"args":    Args,
+				"split":   Split,
 				"quote":   Quote,
 				"mprintf": Mprintf,
 			})
@@ -127,14 +131,10 @@ func Build(cb CommandBuilder, funcs ...template.FuncMap) (args []string, err err
 				return args, err
 			}
 			if b.Len() > 0 {
-				if queryTemplate(tmpl, "args", "||") {
-					for _, arg := range strings.Split(b.String(), "||") {
-						if len(arg) > 0 {
-							args = append(args, arg)
-						}
+				for _, arg := range strings.Split(b.String(), string(0)) {
+					if len(arg) > 0 {
+						args = append(args, arg)
 					}
-				} else {
-					args = append(args, b.String())
 				}
 			}
 			b.Reset()
@@ -142,90 +142,4 @@ func Build(cb CommandBuilder, funcs ...template.FuncMap) (args []string, err err
 	}
 
 	return
-}
-
-func queryTemplate(tmpl *template.Template, ident, s string) bool {
-	return searchNodes(tmpl.Tree.Root, ident, s)
-}
-
-func searchNodes(n parse.Node, ident, s string) bool {
-	switch n.Type() {
-	case
-		parse.NodeBool,
-		parse.NodeDot,
-		parse.NodeField,
-		parse.NodeNumber,
-		parse.NodeVariable:
-		return false
-	}
-	switch n := n.(type) {
-	case *parse.ActionNode:
-		return searchNodes(n.Pipe, ident, s)
-	case *parse.CommandNode:
-		for _, cn := range n.Args {
-			if searchNodes(cn, ident, s) {
-				return true
-			}
-		}
-	case *parse.IdentifierNode:
-		return ident == n.Ident
-	case *parse.IfNode:
-		if searchNodes(n.Pipe, ident, s) {
-			return true
-		}
-		if n.List != nil {
-			if searchNodes(n.List, ident, s) {
-				return true
-			}
-		}
-		if n.ElseList != nil {
-			return searchNodes(n.ElseList, ident, s)
-		}
-	case *parse.ListNode:
-		for _, cn := range n.Nodes {
-			if searchNodes(cn, ident, s) {
-				return true
-			}
-		}
-	case *parse.PipeNode:
-		for _, cn := range n.Cmds {
-			if searchNodes(cn, ident, s) {
-				return true
-			}
-		}
-	case *parse.RangeNode:
-		if searchNodes(n.Pipe, ident, s) {
-			return true
-		}
-		if n.List != nil {
-			if searchNodes(n.List, ident, s) {
-				return true
-			}
-		}
-		if n.ElseList != nil {
-			return searchNodes(n.ElseList, ident, s)
-		}
-	case *parse.StringNode:
-		return strings.Contains(n.Text, s)
-	case *parse.TemplateNode:
-		return searchNodes(n.Pipe, ident, s)
-	case *parse.TextNode:
-		return bytes.Contains(n.Text, []byte(s))
-	case *parse.WithNode:
-		if searchNodes(n.Pipe, ident, s) {
-			return true
-		}
-		if n.List != nil {
-			if searchNodes(n.List, ident, s) {
-				return true
-			}
-		}
-		if n.ElseList != nil {
-			return searchNodes(n.ElseList, ident, s)
-		}
-	default:
-		panic(fmt.Sprintf("external: unknown node type: %T", n))
-	}
-
-	return false
 }
