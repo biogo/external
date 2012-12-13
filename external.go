@@ -33,9 +33,9 @@ type CommandBuilder interface {
 	BuildCommand() (*exec.Cmd, error)
 }
 
-// Mprintf applies Sprintf with the provided format to each element of slice. It returns an
+// mprintf applies Sprintf with the provided format to each element of slice. It returns an
 // error if slice is not a slice or an array or a pointer to either of these types.
-func Mprintf(format string, slice interface{}) (f []string, err error) {
+func mprintf(format string, slice interface{}) (f []string, err error) {
 	v := reflect.ValueOf(slice)
 	if kind := v.Kind(); kind == reflect.Interface || kind == reflect.Ptr {
 		v = v.Elem()
@@ -54,10 +54,10 @@ func Mprintf(format string, slice interface{}) (f []string, err error) {
 	return
 }
 
-// Quote wraps in quotes an item or each element of a slice. The returned value is either
+// quote wraps in quotes an item or each element of a slice. The returned value is either
 // a string or a slice of strings. Maps are not handled; Quote will panic if given a map to
 // process.
-func Quote(s interface{}) interface{} {
+func quote(s interface{}) interface{} {
 	rv := reflect.ValueOf(s)
 	switch rv.Kind() {
 	case reflect.Slice:
@@ -75,26 +75,33 @@ func Quote(s interface{}) interface{} {
 	panic("cannot reach")
 }
 
-// Join calls strings.Join with the parameter order reversed to allow use in a template pipeline.
-func Join(sep string, a []string) string { return strings.Join(a, sep) }
+// join calls strings.Join with the parameter order reversed to allow use in a template pipeline.
+func join(sep string, a []string) string { return strings.Join(a, sep) }
 
-// Args is an alias to Join with sep equal to the split tag.
-func Args(a []string) string { return strings.Join(a, Split()) }
+// splitargs is an alias to Join with sep equal to the split tag.
+func splitargs(a []string) string { return strings.Join(a, split()) }
 
-// Split includes the split tag, "\x00".
-func Split() string { return string(0) }
+// split includes the split tag, "\x00".
+func split() string { return string(0) }
 
 // Build builds a set of command line args from cb, which must be a struct. cb's fields
 // are inspected for struct tags "buildarg" key. The value for buildarg tag should be a valid
 // text template. Build applies executes the template using the value of the field or each
 // element of the value of the field if the field is a slice or an array.
-// An argument split tag, "\x00", is used to denote separation of switches and their parameters.
-// Template functions can be provided via funcs. Four convenience functions are provided:
-//  quote is a template function that wraps elements of a slice of strings in quotes.
-//  mprintf is a template function that applies fmt.Sprintf to each element of a slice.
-//  join is a template function that calls strings.Join with parameter order reversed.
-//  args is a template function that joins a slice of strings with the split tag.
-//  split is a template function that indicates a argument split.
+// An argument split tag, "\x00", is used to denote separation of elements of the args array
+// within any single parameter specification. Template functions can be provided via funcs.
+//
+// Four convenience functions are provided:
+//  quote
+//	Wraps each element of a slice of strings in quotes.
+//  mprintf
+//	Applies fmt.Sprintf to each element of a slice, given a format string.
+//  join
+//	Calls strings.Join with parameter order reversed to allow pipelining.
+//  args
+//	Joins a slice of strings with the split tag.
+//  split
+//	Includes a split tag in a pipeline.
 func Build(cb CommandBuilder, funcs ...template.FuncMap) (args []string, err error) {
 	v := reflect.ValueOf(cb)
 	if kind := v.Kind(); kind == reflect.Interface || kind == reflect.Ptr {
@@ -115,11 +122,11 @@ func Build(cb CommandBuilder, funcs ...template.FuncMap) (args []string, err err
 		if tag != "" {
 			tmpl := template.New(tf.Name)
 			tmpl.Funcs(template.FuncMap{
-				"join":    Join,
-				"args":    Args,
-				"split":   Split,
-				"quote":   Quote,
-				"mprintf": Mprintf,
+				"join":    join,
+				"args":    splitargs,
+				"split":   split,
+				"quote":   quote,
+				"mprintf": mprintf,
 			})
 			for _, fn := range funcs {
 				tmpl.Funcs(fn)
