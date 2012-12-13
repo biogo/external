@@ -38,11 +38,9 @@ func (s *S) SetUpSuite(c *check.C) {
 }
 
 func (s *S) TestBuild(c *check.C) {
-	var err error
-	_, err = Mafft{InFile: "a"}.BuildCommand()
+	cmd, err := Mafft{}.BuildCommand()
 	c.Check(err, check.Equals, nil)
-	_, err = Mafft{}.BuildCommand()
-	c.Check(err, check.Equals, ErrMissingRequired)
+	c.Check(cmd.Args, check.DeepEquals, []string{"mafft", "-"})
 }
 
 func (s *S) TestSeed(c *check.C) {

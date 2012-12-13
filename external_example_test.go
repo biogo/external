@@ -62,7 +62,7 @@ func ExampleBuild_2() {
 		HeaderFile string   `buildarg:"{{if .}}-h||{{.}}{{end}}"`             // [-h inh.sam]
 		SortNames  bool     `buildarg:"{{if .}}-n{{end}}"`                    // [-n]
 		OutFile    string   `buildarg:"{{.}}"`                                // <out.bam>
-		InFiles    []string `buildarg:"{{.}}"`                                // <in.bam>...
+		InFiles    []string `buildarg:"{{args .}}"`                           // <in.bam>...
 		CommandBuilder
 	}
 
@@ -93,18 +93,18 @@ func ExampleBuild_3() {
 	type Sed struct {
 		Name       string
 		Comment    string
-		Cmd        string   `buildarg:"{{if .}}{{.}}{{else}}sed{{end}}"`               // sed
-		Quiet      bool     `buildarg:"{{if .}}-n{{end}}"`                             // [-n]
-		Script     []string `buildarg:"{{if .}}-e||{{printf \"'%s'\".}}{{end}}"`       // [-e '<exp>']...
-		ScriptFile []string `buildarg:"{{if .}}-f||{{.}}{{end}}"`                      // [-f "<file>"]...
-		Follow     bool     `buildarg:"{{if .}}--follow-symlinks{{end}}"`              // [--follow-symlinks]
-		InPlace    InPlace  `buildarg:"{{if .Yes}}-i{{with .Suf}}{{.}}{{end}}{{end}}"` // [-i[suf]]
-		WrapAt     int      `buildarg:"{{if .}}-l||{{.}}{{end}}"`                      // [-l <len>]
-		Posix      bool     `buildarg:"{{if .}}--posix{{end}}"`                        // [--posix]
-		ExtendRE   bool     `buildarg:"{{if .}}-r{{end}}"`                             // [-r]
-		Separate   bool     `buildarg:"{{if .}}-s{{end}}"`                             // [-s]
-		Unbuffered bool     `buildarg:"{{if .}}-u{{end}}"`                             // [-u]
-		InFiles    []string `buildarg:"{{.}}"`                                         // "<in>"...
+		Cmd        string   `buildarg:"{{if .}}{{.}}{{else}}sed{{end}}"`                  // sed
+		Quiet      bool     `buildarg:"{{if .}}-n{{end}}"`                                // [-n]
+		Script     []string `buildarg:"{{if .}}{{mprintf \"-e||'%s'\" . | args}}{{end}}"` // [-e '<exp>']...
+		ScriptFile []string `buildarg:"{{if .}}{{mprintf \"-f||%s\" . | args}}{{end}}"`   // [-f "<file>"]...
+		Follow     bool     `buildarg:"{{if .}}--follow-symlinks{{end}}"`                 // [--follow-symlinks]
+		InPlace    InPlace  `buildarg:"{{if .Yes}}-i{{with .Suf}}{{.}}{{end}}{{end}}"`    // [-i[suf]]
+		WrapAt     int      `buildarg:"{{if .}}-l||{{.}}{{end}}"`                         // [-l <len>]
+		Posix      bool     `buildarg:"{{if .}}--posix{{end}}"`                           // [--posix]
+		ExtendRE   bool     `buildarg:"{{if .}}-r{{end}}"`                                // [-r]
+		Separate   bool     `buildarg:"{{if .}}-s{{end}}"`                                // [-s]
+		Unbuffered bool     `buildarg:"{{if .}}-u{{end}}"`                                // [-u]
+		InFiles    []string `buildarg:"{{args . | printf \"%v\"}}"`                       // "<in>"...
 		CommandBuilder
 	}
 
@@ -129,19 +129,16 @@ func ExampleBuild_3() {
 
 func ExampleBuild_4() {
 	// bowtie [options]* <ebwt> {-1 <m1> -2 <m2> | --12 <r> | <s>} [<hit>]
-	type Files struct {
-		Names []string
-	}
 	type Bowtie struct {
 		Name     string
 		Comment  string
-		Cmd      string `buildarg:"{{if .}}{{.}}{{else}}bowtie{{end}}"`         // bowtie
-		Index    string `buildarg:"{{.}}"`                                      // <ebwt>
-		One      Files  `buildarg:"{{with .Names}}-1{{join \",\" .}}{{end}}"`   // -1 <m1>
-		Two      Files  `buildarg:"{{with .Names}}-2{{join \",\" .}}{{end}}"`   // -2 <m2>
-		Mixed    Files  `buildarg:"{{with .Names}}--12{{join \",\" .}}{{end}}"` // --12 <r>
-		Unpaired Files  `buildarg:"{{with .Names}}{{join \",\" .}}{{end}}"`     // <s>
-		OutFile  string `buildarg:"{{if .}}{{.}}{{end}}"`                       // <hit>
+		Cmd      string   `buildarg:"{{if .}}{{.}}{{else}}bowtie{{end}}"`  // bowtie
+		Index    string   `buildarg:"{{.}}"`                               // <ebwt>
+		One      []string `buildarg:"{{if .}}-1{{join \",\" .}}{{end}}"`   // -1 <m1>
+		Two      []string `buildarg:"{{if .}}-2{{join \",\" .}}{{end}}"`   // -2 <m2>
+		Mixed    []string `buildarg:"{{if .}}--12{{join \",\" .}}{{end}}"` // --12 <r>
+		Unpaired []string `buildarg:"{{if .}}{{join \",\" .}}{{end}}"`     // <s>
+		OutFile  string   `buildarg:"{{if .}}{{.}}{{end}}"`                // <hit>
 		CommandBuilder
 	}
 
@@ -149,7 +146,7 @@ func ExampleBuild_4() {
 		Name:     "Bowtie",
 		Cmd:      "bowtie",
 		Index:    "ebwt",
-		Unpaired: Files{[]string{"a.fa", "b.fa", "c.fa", "d.fa", "e.fa"}},
+		Unpaired: []string{"a.fa", "b.fa", "c.fa", "d.fa", "e.fa"},
 		OutFile:  "oufile",
 	}
 

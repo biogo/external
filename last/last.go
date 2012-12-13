@@ -61,8 +61,8 @@ type DB struct {
 	Verbose     bool   `buildarg:"{{if .}}-v{{end}}"`        // -v: be verbose
 
 	// Files:
-	OutFile string   `buildarg:"{{.}}`  // "<lastdb>"
-	InFiles []string `buildarg:"{{.}}"` // "<in.fa>"...
+	OutFile string   `buildarg:"{{.}}`       // "<lastdb>"
+	InFiles []string `buildarg:"{{args .}}"` // "<in.fa>"...
 }
 
 func (db DB) BuildCommand() (*exec.Cmd, error) {
@@ -167,8 +167,8 @@ type Align struct {
 	InFormat    int     `buildarg:"{{if .}}-Q||{{.}}{{end}}"` // -Q: input format
 
 	// Files:
-	DB      string   `buildarg:"{{.}}"` // "<lastdb>"
-	InFiles []string `buildarg:"{{.}}"` // "<in.fa>"...
+	DB      string   `buildarg:"{{.}}"`      // "<lastdb>"
+	InFiles []string `buildarg:"{{args .}}"` // "<in.fa>"...
 }
 
 func (a Align) BuildCommand() (*exec.Cmd, error) {
@@ -217,9 +217,9 @@ type Expect struct {
 	Calculate    int    `buildarg:"{{if .}}-z||{{.}}{{end}}"` // -z: calculate expected alignments
 
 	// Files:
-	Ref        string   `buildarg:"{{.}}"` // "<lastdb>"
-	Query      string   `buildarg:"{{.}}"` // "<lastdb>"
-	AlignFiles []string `buildarg:"{{.}}"` // "<in.maf>"...
+	Ref        string   `buildarg:"{{.}}"`      // "<lastdb>"
+	Query      string   `buildarg:"{{.}}"`      // "<lastdb>"
+	AlignFiles []string `buildarg:"{{args .}}"` // "<in.maf>"...
 }
 
 func (e Expect) BuildCommand() (*exec.Cmd, error) {

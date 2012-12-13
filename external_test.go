@@ -33,7 +33,7 @@ var _ = check.Suite(&S{})
 
 type Ls struct {
 	Cmd  string   `buildarg:"{{if .}}{{.}}{{else}}ls{{end}}"` // ls
-	Glob []string `buildarg:"{{.}}"`                          // "<in>"...
+	Glob []string `buildarg:"{{if .}}{{args .}}{{end}}"`      // "<in>"...
 }
 
 func (l Ls) BuildCommand() (*exec.Cmd, error) {
@@ -75,8 +75,8 @@ func (s *S) TestLs(c *check.C) {
 }
 
 type Du struct {
-	Cmd     string   `buildarg:"{{if .}}{{.}}{{else}}du{{end}}"` // du
-	Exclude []string `buildarg:"{{if .}}--exclude={{.}}{{end}}"` // --exclude="file"...
+	Cmd     string   `buildarg:"{{if .}}{{.}}{{else}}du{{end}}"`                       // du
+	Exclude []string `buildarg:"{{if .}}{{mprintf \"--exclude=%s\" . | args}}{{end}}"` // --exclude="file"...
 }
 
 func (d Du) BuildCommand() (*exec.Cmd, error) {

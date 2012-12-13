@@ -19,11 +19,8 @@ package mafft
 
 import (
 	"code.google.com/p/biogo.external"
-	"errors"
 	"os/exec"
 )
-
-var ErrMissingRequired = errors.New("mafft: missing required argument")
 
 type Mafft struct {
 	// Usage: mafft <inputfile> > <outputfile>
@@ -74,21 +71,18 @@ type Mafft struct {
 	Quiet      bool `buildarg:"{{if .}}--quiet{{end}}"`      // --quiet
 
 	// Input:
-	Nucleic bool     `buildarg:"{{if .}}--nuc{{end}}"`         // --nuc
-	Amino   bool     `buildarg:"{{if .}}--amino{{end}}"`       // --amino
-	Seed    []string `buildarg:"{{if .}}--seed||{{.}}{{end}}"` // --seed <file>...
+	Nucleic bool     `buildarg:"{{if .}}--nuc{{end}}"`                               // --nuc
+	Amino   bool     `buildarg:"{{if .}}--amino{{end}}"`                             // --amino
+	Seed    []string `buildarg:"{{if .}}{{mprintf \"--seed||%s\" . | args}}{{end}}"` // --seed <file>...
 
 	// Performance:
 	Threads int `buildarg:"{{if .}}--thread||{{.}}{{end}}"` // --thread <n>
 
 	// Files:
-	InFile string `buildarg:"{{if .}}{{.}}{{end}}"` // <inputfile> - use "-" for stdin.
+	InFile string `buildarg:"{{if .}}{{.}}{{else}}-{{end}}"` // <inputfile> - default to Stdin.
 }
 
 func (m Mafft) BuildCommand() (*exec.Cmd, error) {
-	if m.InFile == "" {
-		return nil, ErrMissingRequired
-	}
 	cl, err := external.Build(m)
 	if err != nil {
 		return nil, err
