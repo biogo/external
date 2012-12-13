@@ -17,7 +17,6 @@ package external
 
 import (
 	"fmt"
-	"strings"
 )
 
 func ExampleBuild_1() {
@@ -46,10 +45,10 @@ func ExampleBuild_1() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Printf(strings.Join(args, " "))
+		fmt.Printf("%#v\n", args)
 	}
 	// Output:
-	// samtools sort -n -m 100000000 infile outfile
+	// []string{"samtools", "sort", "-n", "-m", "100000000", "infile", "outfile"}
 }
 
 func ExampleBuild_2() {
@@ -78,10 +77,10 @@ func ExampleBuild_2() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println(strings.Join(args, " "))
+		fmt.Printf("%#v\n", args)
 	}
 	// Output:
-	// samtools merge -h header outfile infile1 infile2
+	// []string{"samtools", "merge", "-h", "header", "outfile", "infile1", "infile2"}
 }
 
 func ExampleBuild_3() {
@@ -121,10 +120,10 @@ func ExampleBuild_3() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println(strings.Join(args, " "))
+		fmt.Printf("%#v\n", args)
 	}
 	// Output:
-	// sed -e 's/\<hi\>/lo/g' -e 's/\<left\>/right/g' -ibottomright -l 76 infile1 infile2
+	// []string{"sed", "-e", "'s/\\<hi\\>/lo/g'", "-e", "'s/\\<left\\>/right/g'", "-ibottomright", "-l", "76", "infile1", "infile2"}
 }
 
 func ExampleBuild_4() {
@@ -154,8 +153,8 @@ func ExampleBuild_4() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println(strings.Join(args, " "))
+		fmt.Printf("%#v\n", args)
 	}
 	// Output:
-	// bowtie ebwt a.fa,b.fa,c.fa,d.fa,e.fa oufile
+	// []string{"bowtie", "ebwt", "a.fa,b.fa,c.fa,d.fa,e.fa", "oufile"}
 }
