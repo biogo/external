@@ -33,53 +33,64 @@ type CommandBuilder interface {
 	BuildCommand() (*exec.Cmd, error)
 }
 
-// mprintf applies Sprintf with the provided format to each element of slice. It returns an
-// error if slice is not a slice or an array or a pointer to either of these types.
-func mprintf(format string, slice interface{}) (f []string, err error) {
-	v := reflect.ValueOf(slice)
-	if kind := v.Kind(); kind == reflect.Interface || kind == reflect.Ptr {
-		v = v.Elem()
+// mprintf applies Sprintf with the provided format to each element of an array, slice or map, or
+// pointer to any of these, otherwise if returns the fmt.Sprintf representation of the underlying
+// value with the given format.
+func mprintf(format string, value interface{}) interface{} {
+	rv := reflect.ValueOf(value)
+	if kind := rv.Kind(); kind == reflect.Interface || kind == reflect.Ptr {
+		rv = rv.Elem()
 	}
-	switch v.Kind() {
-	case reflect.Slice, reflect.Array:
-		l := v.Len()
-		f = make([]string, l)
-		for i := 0; i < l; i++ {
-			f[i] = fmt.Sprintf(format, v.Index(i).Interface())
-		}
-	default:
-		return nil, errors.New("not a slice or array type")
-	}
-
-	return
-}
-
-// quote wraps in quotes an item or each element of a slice. The returned value is either
-// a string or a slice of strings. Maps are not handled; Quote will panic if given a map to
-// process.
-func quote(s interface{}) interface{} {
-	rv := reflect.ValueOf(s)
 	switch rv.Kind() {
-	case reflect.Slice:
+	case reflect.Array, reflect.Slice:
 		q := make([]string, rv.Len())
 		for i := 0; i < rv.Len(); i++ {
-			q[i] = fmt.Sprintf("%q", rv.Index(i).Interface())
+			q[i] = fmt.Sprintf(format, rv.Index(i).Interface())
 		}
 		return q
 	case reflect.Map:
-		panic("external: map quoting not handled")
+		q := make([]string, rv.Len())
+		for i, k := range rv.MapKeys() {
+			q[i] = fmt.Sprintf(format, rv.MapIndex(k).Interface())
+		}
+		return q
 	default:
-		return fmt.Sprintf("%q", s)
+		return fmt.Sprintf(format, rv.Interface())
 	}
 
 	panic("cannot reach")
 }
 
-// join calls strings.Join with the parameter order reversed to allow use in a template pipeline.
-func join(sep string, a []string) string { return strings.Join(a, sep) }
+// quote wraps in quotes an item or each element of an array, slice or map by calling mprintf with
+// "%q" as the format.
+func quote(value interface{}) interface{} { return mprintf("%q", value) }
 
-// splitargs is an alias to Join with sep equal to the split tag.
-func splitargs(a []string) string { return strings.Join(a, split()) }
+// join performs the genric equivalent of a call to strings.Join with the parameter order
+// reversed to allow use in a template pipeline.
+func join(sep string, a interface{}) string {
+	rv := reflect.ValueOf(a)
+	if kind := rv.Kind(); kind == reflect.Interface || kind == reflect.Ptr {
+		rv = rv.Elem()
+	}
+	switch rv.Kind() {
+	case reflect.Array, reflect.Slice:
+		cs := make([]string, rv.Len())
+		for i := 0; i < rv.Len(); i++ {
+			cs[i] = fmt.Sprint(rv.Index(i))
+		}
+		return strings.Join(cs, sep)
+	case reflect.Map:
+		cs := make([]string, rv.Len())
+		for i, k := range rv.MapKeys() {
+			cs[i] = fmt.Sprint(rv.MapIndex(k))
+		}
+		return strings.Join(cs, sep)
+	}
+	return fmt.Sprint(a)
+}
+
+// splitargs is an alias to join with sep equal to the split tag.
+func splitargs(a interface{}) string { return join(split(), a) }
 
 // split includes the split tag, "\x00".
 func split() string { return string(0) }
@@ -88,20 +99,29 @@ func split() string { return string(0) }
 // are inspected for struct tags "buildarg" key. The value for buildarg tag should be a valid
 // text template. Build applies executes the template using the value of the field or each
 // element of the value of the field if the field is a slice or an array.
-// An argument split tag, "\x00", is used to denote separation of elements of the args array
+// An argument split tag, "\x00", can be used to denote separation of elements of the args array
 // within any single parameter specification. Template functions can be provided via funcs.
 //
 // Four convenience functions are provided:
-//  quote
-//	Wraps each element of a slice of strings in quotes.
-//  mprintf
-//	Applies fmt.Sprintf to each element of a slice, given a format string.
-//  join
-//	Calls strings.Join with parameter order reversed to allow pipelining.
 //  args
-//	Joins a slice of strings with the split tag.
+//	Joins %v representation of elements of an array, slice or map, or reference to any of
+//	these, using split tag as a separator. Otherwise it returns the %v representation of the
+//	underlying value.
+//  join
+//	Joins %v representation of elements of an array, slice or map, or reference to any of
+//	these, using the the value of the first argument as a separator. Otherwise it returns the
+//	%v representation of the underlying value.
+//  mprintf
+//	Applies fmt.Sprintf, given a format string, to a value or each element of an array, slice
+//	or map, or reference to any of these.
+//  quote
+//	Wraps in quotes a value or each element of an array, slice or map, or reference to any
+//	of these.
 //  split
 //	Includes a split tag in a pipeline.
+//
+//  Note that args, join, mprintf and quote will return randomly ordered arguments if a map is used
+//  as a template input.
 func Build(cb CommandBuilder, funcs ...template.FuncMap) (args []string, err error) {
 	v := reflect.ValueOf(cb)
 	if kind := v.Kind(); kind == reflect.Interface || kind == reflect.Ptr {
