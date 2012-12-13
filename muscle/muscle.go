@@ -140,9 +140,6 @@ func hours(d time.Duration) float64 {
 }
 
 func (m Muscle) BuildCommand() (*exec.Cmd, error) {
-	cl, err := external.Build(m, template.FuncMap{"hours": hours})
-	if err != nil {
-		return nil, err
-	}
+	cl := external.Must(external.Build(m, template.FuncMap{"hours": hours}))
 	return exec.Command(cl[0], cl[1:]...), nil
 }

@@ -41,12 +41,8 @@ func ExampleBuild_1() {
 		OutFile:   "outfile",
 	}
 
-	args, err := Build(s)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Printf("%#v\n", args)
-	}
+	args := Must(Build(s))
+	fmt.Printf("%#v\n", args)
 	// Output:
 	// []string{"samtools", "sort", "-n", "-m", "100000000", "infile", "outfile"}
 }
@@ -73,12 +69,8 @@ func ExampleBuild_2() {
 		OutFile:    "outfile",
 	}
 
-	args, err := Build(s)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Printf("%#v\n", args)
-	}
+	args := Must(Build(s))
+	fmt.Printf("%#v\n", args)
 	// Output:
 	// []string{"samtools", "merge", "-h", "header", "outfile", "infile1", "infile2"}
 }
@@ -116,12 +108,8 @@ func ExampleBuild_3() {
 		InFiles: []string{"infile1", "infile2"},
 	}
 
-	args, err := Build(s)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Printf("%#v\n", args)
-	}
+	args := Must(Build(s))
+	fmt.Printf("%#v\n", args)
 	// Output:
 	// []string{"sed", "-e", "'s/\\<hi\\>/lo/g'", "-e", "'s/\\<left\\>/right/g'", "-ibottomright", "-l", "76", "infile1", "infile2"}
 }
@@ -149,12 +137,8 @@ func ExampleBuild_4() {
 		OutFile:  "oufile",
 	}
 
-	args, err := Build(b)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Printf("%#v\n", args)
-	}
+	args := Must(Build(b))
+	fmt.Printf("%#v\n", args)
 	// Output:
 	// []string{"bowtie", "ebwt", "a.fa,b.fa,c.fa,d.fa,e.fa", "oufile"}
 }

@@ -69,10 +69,7 @@ func (db DB) BuildCommand() (*exec.Cmd, error) {
 	if db.OutFile == "" || len(db.InFiles) == 0 {
 		return nil, ErrMissingRequired
 	}
-	cl, err := external.Build(db)
-	if err != nil {
-		return nil, err
-	}
+	cl := external.Must(external.Build(db))
 	return exec.Command(cl[0], cl[1:]...), nil
 }
 
@@ -175,10 +172,7 @@ func (a Align) BuildCommand() (*exec.Cmd, error) {
 	if a.DB == "" || len(a.InFiles) == 0 {
 		return nil, ErrMissingRequired
 	}
-	cl, err := external.Build(a)
-	if err != nil {
-		return nil, err
-	}
+	cl := external.Must(external.Build(a))
 	return exec.Command(cl[0], cl[1:]...), nil
 }
 
@@ -226,9 +220,6 @@ func (e Expect) BuildCommand() (*exec.Cmd, error) {
 	if e.Ref == "" || e.Query == "" {
 		return nil, ErrMissingRequired
 	}
-	cl, err := external.Build(e)
-	if err != nil {
-		return nil, err
-	}
+	cl := external.Must(external.Build(e))
 	return exec.Command(cl[0], cl[1:]...), nil
 }

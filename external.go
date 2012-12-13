@@ -170,3 +170,12 @@ func Build(cb CommandBuilder, funcs ...template.FuncMap) (args []string, err err
 
 	return
 }
+
+// Must is a helper that wraps a call to a function returning ([]string, error)
+// and panics if the error is non-nil.
+func Must(args []string, err error) []string {
+	if err != nil {
+		panic(fmt.Sprintf("external: failed to build args list: %v: built %#v", err, args))
+	}
+	return args
+}

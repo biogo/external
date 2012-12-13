@@ -37,10 +37,7 @@ type Ls struct {
 }
 
 func (l Ls) BuildCommand() (*exec.Cmd, error) {
-	cl, err := Build(l)
-	if err != nil {
-		return nil, err
-	}
+	cl := Must(Build(l))
 	return exec.Command(cl[0], cl[1:]...), nil
 }
 
@@ -80,10 +77,7 @@ type Du struct {
 }
 
 func (d Du) BuildCommand() (*exec.Cmd, error) {
-	cl, err := Build(d)
-	if err != nil {
-		return nil, err
-	}
+	cl := Must(Build(d))
 	return exec.Command(cl[0], cl[1:]...), nil
 }
 

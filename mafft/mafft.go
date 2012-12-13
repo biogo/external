@@ -83,9 +83,6 @@ type Mafft struct {
 }
 
 func (m Mafft) BuildCommand() (*exec.Cmd, error) {
-	cl, err := external.Build(m)
-	if err != nil {
-		return nil, err
-	}
+	cl := external.Must(external.Build(m))
 	return exec.Command(cl[0], cl[1:]...), nil
 }
