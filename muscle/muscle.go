@@ -121,7 +121,7 @@ type Muscle struct {
 	PPScore        bool `buildarg:"{{if .}}-ppscore{{end}}"`   // -ppscore
 	SumOfPairsNuc  bool `buildarg:"{{if .}}-spn{{end}}"`       // -spn
 	SumOfPairsProf bool `buildarg:"{{if .}}-sv{{end}}"`        // -sv
-	verbose        bool `buildarg:"{{if .}}-verbose{{end}}"`   // -verbose
+	Verbose        bool `buildarg:"{{if .}}-verbose{{end}}"`   // -verbose
 }
 
 func hours(d time.Duration) float64 {
