@@ -9,6 +9,7 @@ import (
 	check "launchpad.net/gocheck"
 	"os/exec"
 	"sort"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -105,12 +106,23 @@ func (s *S) TestDu(c *check.C) {
 	if err != nil {
 		c.Check(err, check.Equals, nil) // Run Du command.
 	}
+
+	// Expected behaviour of du on a directory is that all first elements of a line
+	// be a positive integer and the last line's value be the sum of previous lines.
+	// In the biogo hierarchy, all dir names are in [a-z]+.
 	list := strings.Fields(du.Stdout.(*bytes.Buffer).String())
-	c.Check(list, check.DeepEquals, []string{
-		"16", "./last",
-		"20", "./muscle",
-		"128", "./mafft",
-		"164", ".",
-	})
+	var sum int
+	for i := 0; i < len(list)-3; i += 2 {
+		size, err := strconv.Atoi(list[i])
+		c.Check(err, check.Equals, nil)
+		c.Check(size >= 0, check.Equals, true)
+		if i != len(list)-2 {
+			sum += size
+			c.Check(list[i+1], check.Matches, "./[a-z]+")
+		} else {
+			c.Check(list[i], check.Equals, sum)
+			c.Check(list[i+1], check.Equals, ".")
+		}
+	}
 	c.Check(du.Stderr.(*bytes.Buffer).String(), check.Equals, "")
 }
