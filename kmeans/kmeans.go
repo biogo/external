@@ -97,9 +97,11 @@ func (x Xmeans) BuildCommand() (*exec.Cmd, error) {
 	//  change void my_error_default(const char *string) in kmeans/utils/ambs.c
 	//  to something less drastic.
 	//
-	_, err := os.Open(x.InFile + ".universe")
-	if err != nil {
-		return nil, ErrNoUniverse
+	if !x.CreateUniverse {
+		_, err := os.Open(x.InFile + ".universe")
+		if err != nil {
+			return nil, ErrNoUniverse
+		}
 	}
 
 	cl := external.Must(external.Build(x))
