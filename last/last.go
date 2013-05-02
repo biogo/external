@@ -50,7 +50,7 @@ type DB struct {
 	Verbose     bool   `buildarg:"{{if .}}-v{{end}}"`               // -v: be verbose
 
 	// Files:
-	OutFile string   `buildarg:"{{.}}`       // "<lastdb>"
+	OutFile string   `buildarg:"{{.}}"`      // "<lastdb>"
 	InFiles []string `buildarg:"{{args .}}"` // "<in.fa>"...
 }
 
@@ -184,7 +184,7 @@ type Expect struct {
 	//      1 = reference counts file / each query sequence
 	//      2 = each reference sequence / query counts file
 	//      3 = each reference sequence / each query sequence (0)
-	//      
+	//
 	Cmd string `buildarg:"{{if .}}{{.}}{{else}}lastex{{end}}"` // lastex
 
 	// Options:

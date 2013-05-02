@@ -16,8 +16,8 @@ import (
 )
 
 // CommandBuilder is an interface that assembles a set of command line arguments, and creates
-// an *exec.Cmd that can run the command. The method BuildCommand is responsible for handling 
-// set up of redirections and parameter sanity checking if required. 
+// an *exec.Cmd that can run the command. The method BuildCommand is responsible for handling
+// set up of redirections and parameter sanity checking if required.
 type CommandBuilder interface {
 	BuildCommand() (*exec.Cmd, error)
 }
