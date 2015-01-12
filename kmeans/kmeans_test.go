@@ -7,7 +7,7 @@ package kmeans
 import (
 	"code.google.com/p/biogo.external"
 
-	check "launchpad.net/gocheck"
+	"gopkg.in/check.v1"
 	"os/exec"
 	"strings"
 	"testing"

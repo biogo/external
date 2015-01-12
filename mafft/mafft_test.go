@@ -6,7 +6,7 @@ package mafft
 
 import (
 	"bytes"
-	check "launchpad.net/gocheck"
+	"gopkg.in/check.v1"
 	"os/exec"
 	"strings"
 	"testing"
