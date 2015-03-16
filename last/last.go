@@ -7,7 +7,7 @@
 package last
 
 import (
-	"code.google.com/p/biogo.external"
+	"github.com/biogo/external"
 	"errors"
 	"os/exec"
 )

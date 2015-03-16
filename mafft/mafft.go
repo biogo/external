@@ -7,7 +7,7 @@
 package mafft
 
 import (
-	"code.google.com/p/biogo.external"
+	"github.com/biogo/external"
 	"os/exec"
 )
 

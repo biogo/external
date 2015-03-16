@@ -5,7 +5,7 @@
 package kmeans
 
 import (
-	"code.google.com/p/biogo.external"
+	"github.com/biogo/external"
 
 	"gopkg.in/check.v1"
 	"os/exec"

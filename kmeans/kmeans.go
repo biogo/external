@@ -7,7 +7,7 @@
 package kmeans
 
 import (
-	"code.google.com/p/biogo.external"
+	"github.com/biogo/external"
 
 	"bufio"
 	"errors"

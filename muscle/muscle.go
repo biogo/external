@@ -7,7 +7,7 @@
 package muscle
 
 import (
-	"code.google.com/p/biogo.external"
+	"github.com/biogo/external"
 	"os/exec"
 	"text/template"
 	"time"
