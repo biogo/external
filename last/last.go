@@ -1,4 +1,4 @@
-// Copyright ©2012 The bíogo.external Authors. All rights reserved.
+// Copyright ©2012 The bíogo Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -7,9 +7,10 @@
 package last
 
 import (
-	"github.com/biogo/external"
 	"errors"
 	"os/exec"
+
+	"github.com/biogo/external"
 )
 
 var ErrMissingRequired = errors.New("last: missing required argument")

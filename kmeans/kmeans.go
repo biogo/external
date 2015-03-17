@@ -1,4 +1,4 @@
-// Copyright ©2013 The bíogo.external Authors. All rights reserved.
+// Copyright ©2013 The bíogo Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -7,8 +7,6 @@
 package kmeans
 
 import (
-	"github.com/biogo/external"
-
 	"bufio"
 	"errors"
 	"io"
@@ -16,6 +14,8 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/biogo/external"
 )
 
 var (
