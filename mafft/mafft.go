@@ -7,8 +7,9 @@
 package mafft
 
 import (
-	"github.com/biogo/external"
 	"os/exec"
+
+	"github.com/biogo/external"
 )
 
 type Mafft struct {

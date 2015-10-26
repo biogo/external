@@ -7,10 +7,11 @@
 package muscle
 
 import (
-	"github.com/biogo/external"
 	"os/exec"
 	"text/template"
 	"time"
+
+	"github.com/biogo/external"
 )
 
 type Log struct {
