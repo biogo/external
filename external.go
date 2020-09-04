@@ -82,7 +82,7 @@ func join(sep string, a interface{}) string {
 func splitargs(a interface{}) string { return join(split(), a) }
 
 // split includes the split tag, "\x00".
-func split() string { return string(0) }
+func split() string { return string(rune(0)) }
 
 // Build builds a set of command line args from cb, which must be a struct. cb's fields
 // are inspected for struct tags "buildarg" key. The value for buildarg tag should be a valid
@@ -147,7 +147,7 @@ func Build(cb CommandBuilder, funcs ...template.FuncMap) (args []string, err err
 				return args, err
 			}
 			if b.Len() > 0 {
-				for _, arg := range strings.Split(b.String(), string(0)) {
+				for _, arg := range strings.Split(b.String(), string(rune(0))) {
 					if len(arg) > 0 {
 						args = append(args, arg)
 					}
